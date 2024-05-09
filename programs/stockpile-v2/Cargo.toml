@@ -1,0 +1,26 @@
+[package]
+name = "stockpile-v2"
+version = "0.1.0"
+description = "Funding Without Barriers."
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "stockpile_v2"
+
+[features]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+cpi = ["no-entrypoint"]
+default = []
+
+[dependencies]
+anchor-lang = { version = "0.28.0", features = ["init-if-needed"] }
+anchor-spl = "0.28.0"
+pyth-sdk-solana = "0.8.0"
+solana-program = "=1.16.17"
+winnow = "=0.4.1"
+toml_datetime="=0.6.1"
+solana-gateway = { version = "0.4.0", features = ["no-entrypoint"] }
+solana-security-txt = "1.1.1"
