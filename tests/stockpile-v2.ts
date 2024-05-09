@@ -50,5 +50,50 @@ describe("stockpile-v2", () => {
       // If it passes, we get a friendly message
       console.log(`🚀 Project "${name}" Created! Transaction Hash:`, tx);
     });
+
+    it("createPool", async () => {
+        // Generate payer keypair, and random poolId
+        const payer = anchor.web3.Keypair.generate();
+        const admin1 = anchor.web3.Keypair.generate();
+        const admin2 = anchor.web3.Keypair.generate();
+        const admin3 = anchor.web3.Keypair.generate();
+        let poolId = Math.floor(1 + Math.random() * 9)
+    
+        // Fund payer account
+        await connection.requestAirdrop(payer.publicKey, 2);
+    
+        // Find PDA address
+        const [poolPDA, bump] = await anchor.web3.PublicKey.findProgramAddressSync(
+            [utf8.encode("pool"), new anchor.BN(poolId).toArrayLike(Buffer, "le", 8)],
+            program.programId
+        );
+    
+        // Define dummy values
+        let name = "Money Laundering Machine";
+        let start = new anchor.BN(Math.floor(Date.now() / 1000));
+        let end = new anchor.BN(Math.floor(Date.now() / 1000) + 30000);
+        let admins = [admin1.publicKey, admin2.publicKey, admin3.publicKey];
+      
+        // Alea iacta est
+        const tx = await program.methods.createPool(
+          new anchor.BN(poolId), 
+          name, 
+          new anchor.BN(start), 
+          new anchor.BN(end), 
+          admins
+        )
+        .accounts({
+          payer: payer.publicKey,
+          systemProgram: anchor.web3.SystemProgram.programId,
+          pool: poolPDA,
+        })
+        .signers([ payer ])
+        .rpc({
+          skipPreflight: true
+        });
+    
+        // If it passes, we get a friendly message
+        console.log(`👾 Funding Round "${name}" Initialized! Transaction Hash:`, tx);
+      });
   
 }
