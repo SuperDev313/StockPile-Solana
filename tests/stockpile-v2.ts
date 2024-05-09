@@ -95,5 +95,38 @@ describe("stockpile-v2", () => {
         // If it passes, we get a friendly message
         console.log(`👾 Funding Round "${name}" Initialized! Transaction Hash:`, tx);
       });
+
+      it("createSource", async () => {
+        // Generate keypairs for payer, and admins
+        const payer = anchor.web3.Keypair.generate();
+    
+        // Fund payer account
+        await connection.requestAirdrop(payer.publicKey, 2);
+    
+        // Find PDA address
+        const [sourcePDA, bump] = await anchor.web3.PublicKey.findProgramAddressSync(
+            [utf8.encode("source"), payer.publicKey.toBuffer()],
+            program.programId
+        );
+    
+        // Define dummy value
+        let name = "Buffalo Joe";
+      
+        // Run it up
+        const tx = await program.methods.createSource(name)
+        .accounts({
+          payer: payer.publicKey,
+          source: sourcePDA,
+          systemProgram: anchor.web3.SystemProgram.programId
+        })
+        .signers([ payer ])
+        .rpc({
+          skipPreflight: true
+        });
+    
+        // If it passes, we get a friendly message
+        console.log(`✨ Source "${name}" Created! Transaction Hash:`, tx);
+      });
+    
   
 }
